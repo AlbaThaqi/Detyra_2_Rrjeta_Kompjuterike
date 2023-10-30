@@ -1,0 +1,1 @@
+# Det_2RrjetaKompjuterike
