@@ -44,9 +44,11 @@ int main() {
 }
    if (strcmp(buffer, "Authentication successful. Access granted.") == 0) {
 
+       while (true) {
 
+           cout << "Enter a command ('read <file_name>', 'write <string> <file_name>, execute <command> or type 'exit' to end): ";
 
-   
+           cin.getline(buffer, sizeof(buffer));
 
            if (strcmp(buffer, "exit") == 0) {
 
