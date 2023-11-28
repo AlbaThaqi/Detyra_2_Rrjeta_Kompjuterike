@@ -44,9 +44,7 @@ int main() {
 
 
 
-    
-
-
+   
 
            if (strcmp(buffer, "exit") == 0) {
 
