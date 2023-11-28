@@ -40,3 +40,18 @@ int main() {
 
     return 0;
 }
+   if (strcmp(buffer, "Authentication successful. Access granted.") == 0) {
+
+
+
+    
+
+
+
+           if (strcmp(buffer, "exit") == 0) {
+
+               break;
+
+           }
+
+
