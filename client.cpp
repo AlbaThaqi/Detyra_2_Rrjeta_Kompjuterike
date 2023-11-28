@@ -29,7 +29,7 @@ int main() {
     serverAddress.sin_family = AF_INET;
     serverAddress.sin_addr.s_addr = inet_addr(IP_ADDRESS);
     serverAddress.sin_port = htons(PORT);
-
+while (true){
     closesocket(clientSocket);
     WSACleanup();
 
