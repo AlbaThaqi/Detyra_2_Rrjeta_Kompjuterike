@@ -53,5 +53,24 @@ int main() {
                break;
 
            }
+sendto(clientSocket, buffer, strlen(buffer), 0, (struct sockaddr*)&serverAddress, sizeof(serverAddress));
+
+ 
+
+                memset(buffer, 0, sizeof(buffer));
+
+                int bytesRead = recvfrom(clientSocket, buffer, sizeof(buffer), 0, NULL, NULL);
+
+ 
+
+                cout << "Server Response: " << buffer << endl;
+
+            }
+
+        }
+
+ 
+
+    }
 
 
