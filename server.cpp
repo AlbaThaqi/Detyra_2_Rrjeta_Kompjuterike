@@ -10,6 +10,20 @@ using namespace std;
 
 const int PORT = 12345;
 const char* IP_ADDRESS = "127.0.0.1";
+bool authenticate(const char* credentials, bool& readOnly) {
+
+    if (strcmp(credentials, "admin:admin123") == 0) {
+        readOnly = false;
+        return true;
+    }
+    else if (strcmp(credentials, "readonly:readonly123") == 0) {
+        readOnly = true;
+        return true;
+    }
+    else {
+        return false;
+    }
+}
 
 int main() {
  
