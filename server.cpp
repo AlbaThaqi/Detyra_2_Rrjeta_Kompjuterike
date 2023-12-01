@@ -55,7 +55,20 @@ int main() {
     }
 
     cout << "Success binding the server socket...";
-
+    
+const int numClients = 4;
+    vector clientThreads;
+    
+    for (int i = 0; i < numClients; ++i) 
+    { sockaddr_in clientAddress; 
+     int clientAddressLength = sizeof(clientAddress);
+   
+     clientThreads.emplace_back(handleClient, serverSocket, clientAddress);
+    } for (auto& thread : clientThreads)
+        { if (thread.joinable()) 
+        { thread.join(); 
+        } 
+        }
     closesocket(serverSocket);
     WSACleanup();
 
