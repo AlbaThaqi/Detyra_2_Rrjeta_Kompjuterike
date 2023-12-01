@@ -1,5 +1,6 @@
 # Det_2RrjetaKompjuterike
 Kërkesat e detyrës:
+
 Serveri 
 1. Të vendosen variabla te cilat përmbajnë numrin e portit (numri i portit të jetë i 
 çfarëdoshëm) dhe IP adresën; 
@@ -8,7 +9,8 @@ Serveri
 ekzekutoje të paktën një kërkesë në server); 
 4. Të jetë në gjendje të lexoj mesazhet që dërgohen nga klientët; 
 5. Të jetë në gjendje të jap qasje të plotë të paktën njërit klient për qasje ne folderat/ 
-përmbajtjen në file-t në server. 
+përmbajtjen në file-t në server.
+
 Klienti 
 1. Të krijohet socket lidhja me server; 
 2. Njeri nga pajisjet (klientët) të ketë privilegjet write(), read(), execute(); 
