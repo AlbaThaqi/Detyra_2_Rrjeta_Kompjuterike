@@ -62,8 +62,9 @@ int main() {
     return 0;
 }
 
+
 WSADATA WSADATA wsaData;
-if (WSAStartup (MAKEWORD (2, 2), &wsaData) != 0) {
+if (WSAStartup(MAKEWORD(2, 2), &wsaData) != 0) {
     cerr << "Failed to initialize Winsock." << endl;
     return -1;
 }
@@ -71,10 +72,13 @@ if (WSAStartup (MAKEWORD (2, 2), &wsaData) != 0) {
 int serverSocket = socket(AF_INET, SOCK_DGRAM, 0);
 if (serverSocket == -1) {
     cerr << "Error creating server socket." << endl;
-    
+    WSACleanup();
+    return -1;
 }
 
 sockaddr_in serverAddress;
 serverAddress.sin_family = AF_INET;
 serverAddress.sin_addr.s_addr = inet_addr(IP_ADDRESS);
 serverAddress.sin_port = htons(PORT);
+
+
