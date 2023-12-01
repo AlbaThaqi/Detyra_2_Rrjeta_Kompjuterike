@@ -73,3 +73,8 @@ if (serverSocket == -1) {
     cerr << "Error creating server socket." << endl;
     
 }
+
+sockaddr_in serverAddress;
+serverAddress.sin_family = AF_INET;
+serverAddress.sin_addr.s_addr = inet_addr(IP_ADDRESS);
+serverAddress.sin_port = htons(PORT);
