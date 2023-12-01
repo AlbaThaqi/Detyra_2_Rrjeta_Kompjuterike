@@ -2,6 +2,10 @@
 #include <cstring>
 #include <winsock2.h>
 #include <ws2tcpip.h>
+#include <thread>
+#include <vector>
+#include <fstream>
+#include <sstream>
 
 #pragma warning(disable:4996) 
 #pragma comment(lib, "Ws2_32.lib")
@@ -44,8 +48,88 @@ string executeCommand(const string& command) {
 
     return result.empty() ? "Command executed successfully!" : result;
 }
+void handleClient(int serverSocket, sockaddr_in clientAddress) {
+    char buffer[1024];
+    int bytesRead;
+
+    while (true) {
+        memset(buffer, 0, sizeof(buffer));
+
+        int clientAddressLength = sizeof(clientAddress);
+
+        bytesRead = recvfrom(serverSocket, buffer, sizeof(buffer), 0, (struct sockaddr*)&clientAddress, &clientAddressLength);
+
+        bool readOnly;
+        if (authenticate(buffer, readOnly)) {
+            const char* authSuccessMessage = "Authentication successful. Access granted.";
+            sendto(serverSocket, authSuccessMessage, strlen(authSuccessMessage), 0, (struct sockaddr*)&clientAddress, sizeof(clientAddress));
+
+            while (true) {
+                memset(buffer, 0, sizeof(buffer));
+
+                bytesRead = recvfrom(serverSocket, buffer, sizeof(buffer), 0, (struct sockaddr*)&clientAddress, &clientAddressLength);
+
+                string command(buffer);
+                istringstream iss(command);
+                string action, content, fileName;
+                iss >> action;
+
+                if ((action == "read" && readOnly) || (action == "write" && !readOnly) ) {
+                    if (action == "read") {
+                        iss >> fileName;
+
+                        ifstream file(fileName, ios::binary);
+
+                        if (file) {
+                            string fileContent((istreambuf_iterator<char>(file)), istreambuf_iterator<char>());
+                            file.close();
+    
+                            sendto(serverSocket, fileContent.c_str(), fileContent.length(), 0, (struct sockaddr*)&clientAddress, sizeof(clientAddress));
+                        }
+                        else {
+                            const char* errorMessage = "Error: File not found.";
+                            sendto(serverSocket, errorMessage, strlen(errorMessage), 0, (struct sockaddr*)&clientAddress, sizeof(clientAddress));
+                        }
+                    }
+                    else if (action == "write") {
+                        iss >> content >> fileName;
+
+                        ofstream file(fileName, ios::binary);
+
+                        if (file) {
+                            file << content;
+                            file.close();
+
+                            const char* successMessage = "File was written successfully.";
+                            sendto(serverSocket, successMessage, strlen(successMessage), 0, (struct sockaddr*)&clientAddress, sizeof(clientAddress));
+                        }
+                        else {
+                            const char* errorMessage = "Error: Unable to write to file.";
+                            sendto(serverSocket, errorMessage, strlen(errorMessage), 0, (struct sockaddr*)&clientAddress, sizeof(clientAddress));
+                        }
+                    }
+                }
+                else if (action == "execute" && !readOnly) {
+                
+                    getline(iss, content);
+                    string result = executeCommand(content);
+                    sendto(serverSocket, result.c_str(), result.length(), 0, (struct sockaddr*)&clientAddress, sizeof(clientAddress));
+                }
+                else {
+
+                    const char* errorMessage = "Error: Unauthorized or unsupported command.";
+                    sendto(serverSocket, errorMessage, strlen(errorMessage), 0, (struct sockaddr*)&clientAddress, sizeof(clientAddress));
+                }
+            }
+        }
+        else {
+            const char* authFailureMessage = "Authentication failed. Access denied.";
+            sendto(serverSocket, authFailureMessage, strlen(authFailureMessage), 0, (struct sockaddr*)&clientAddress, sizeof(clientAddress));
+        }
+    }
+}
 int main() {
-WSADATA WSADATA wsaData;
+WSADATA wsaData;
 
 if (WSAStartup(MAKEWORD(2, 2), &wsaData) != 0) {
     cerr << "Failed to initialize Winsock." << endl;
@@ -53,18 +137,17 @@ if (WSAStartup(MAKEWORD(2, 2), &wsaData) != 0) {
 }
 
 int serverSocket = socket(AF_INET, SOCK_DGRAM, 0);
+    
 if (serverSocket == -1) {
     cerr << "Error creating server socket." << endl;
     WSACleanup();
     return -1;
 }
-
 sockaddr_in serverAddress;
 serverAddress.sin_family = AF_INET;
 serverAddress.sin_addr.s_addr = inet_addr(IP_ADDRESS);
 serverAddress.sin_port = htons(PORT);
  
-
     if (bind(serverSocket, (struct sockaddr*)&serverAddress, sizeof(serverAddress)) == -1) {
         cerr << "Error binding server socket to address and port." << endl;
         closesocket(serverSocket);
