@@ -24,7 +24,26 @@ bool authenticate(const char* credentials, bool& readOnly) {
         return false;
     }
 }
+string executeCommand(const string& command) {
+    string result;
 
+    FILE* pipe = _popen(command.c_str(), "r");
+
+    if (!pipe) {
+        return "Error executing command.";
+    }
+
+    char buffer[128];
+    while (!feof(pipe)) {
+        if (fgets(buffer, 128, pipe) != nullptr) {
+            result += buffer;
+        }
+    }
+
+    _pclose(pipe);
+
+    return result.empty() ? "Command executed successfully!" : result;
+}
 int main() {
  
 
