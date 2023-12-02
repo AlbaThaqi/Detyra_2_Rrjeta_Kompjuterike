@@ -8,8 +8,9 @@
 
 using namespace std;
 
-const int PORT = 12345;
-const char* IP_ADDRESS = "127.0.0.1";
+const int PORT = 1205;
+const char* IP_ADDRESS = "192.168.1.17"; // IP adresa e serverit
+// const char* IP_ADDRESS = "127.0.0.1";
 
 int main() {
     WSADATA wsaData;
@@ -52,7 +53,9 @@ int main() {
                 cin.getline(buffer, sizeof(buffer));
 
                 if (strcmp(buffer, "exit") == 0) {
-                    break;
+                    const char* exitMessage = "Client disconnected.";
+                    sendto(clientSocket, exitMessage, strlen(exitMessage), 0, (struct sockaddr*)&serverAddress, sizeof(serverAddress));
+                    break; 
                 }
 
                 sendto(clientSocket, buffer, strlen(buffer), 0, (struct sockaddr*)&serverAddress, sizeof(serverAddress));
@@ -61,9 +64,14 @@ int main() {
                 int bytesRead = recvfrom(clientSocket, buffer, sizeof(buffer), 0, NULL, NULL);
 
                 cout << "Server Response: " << buffer << endl;
-            }
-        }
 
+                if (strcmp(buffer, "Limit of clients reached!") == 0) {
+                    cout << "Disconnecting the client...";
+                    break;
+                }
+            }
+            break; 
+        }
     }
 
     closesocket(clientSocket);
