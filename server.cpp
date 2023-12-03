@@ -143,6 +143,7 @@ if (serverSocket == -1) {
     WSACleanup();
     return -1;
 }
+
 sockaddr_in serverAddress;
 serverAddress.sin_family = AF_INET;
 serverAddress.sin_addr.s_addr = inet_addr(IP_ADDRESS);
